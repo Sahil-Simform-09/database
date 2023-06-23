@@ -76,7 +76,22 @@
         1. search key as name, YES      
         2. search key as name+gender, YES       
         3. search key as gender, NO     
-        4. search key as gender+city, NO        
+        4. search key as gender+city, NO       
+- **[Multi key indexes](https://www.mongodb.com/docs/manual/core/index-multikey/)**
+    - To index a field that holds an array value, MongoDB creates an index key for each element in the array. These multikey indexes support efficient queries against array fields. Multikey indexes can be constructed over arrays that hold both scalar values [1] (e.g. strings, numbers) and nested documents.
+    - A scalar value refers to value that is neither an embedded document nor an array.
+    - For embeded document multi key index is created and index store whole document not fields of the document therefore when we try to search particular filed for document on which we've created index it'll not use index.
+    - Compound index can made for multi key index, but only one array field should use to create index. We can not use more than 1 array field to create compund indexes.
+- **[Text Index](https://www.mongodb.com/docs/manual/core/index-text/)**
+    - To run text search queries on self-managed deployments, you must have a text index on your collection. MongoDB provides text indexes to support text search queries on string content. Text indexes can include any field whose value is a string or an array of string elements. A collection can only have one text search index, but that index can cover multiple fields.
+    - Mongodb text search exact phrase.     
+        `db.movie.find({$text: {$search: "\"Bollywood movie\""}})`
+    - sort according best match help of textScore. Highest score document will be first.
+        `db.movie.find({$text: {$search: "Bollywood movie"}}).sort({score: {$meta: "textScore"}})`
+    - create combiend text index.
+        `db.movie.find({$text: {$search: "Bollywood movie"}})`      
+    - exclude words
+        `db.movie.find({$text: {$search: "movies -bollywood"}})`        
 - **Using indexes for sorting**:    
     - If you wan't to search something then sort according some property and if we have index on the property on which we have to sort then index scan happens. Because index store the value in sorted order.
     - MongoDB has threshold of 32 MB for sorting in memory and if you don't have index, mongoDB will essentialy fetch all your documents into memory and do the sort there. If your collection has billions of documents then do sorting in memory is not possible for that ew need to create index which accentialy store in sorted order.
